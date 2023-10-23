@@ -21,17 +21,17 @@ fun main() = application {
 
 
     oliveProgram {
-        val horizontalNr = 10
-        val verticalNr = 10
+        val horizontalNr = 5
+        val verticalNr = 5
         val locations = List(horizontalNr * verticalNr) { index ->
             Vector2(
-                ((index % verticalNr).toDouble() * (height / verticalNr)),
-                ((index / horizontalNr).toDouble() * (width / horizontalNr))
+                ((index % verticalNr).toDouble() * (height / sin(seconds * 0.001))),
+                ((index / horizontalNr).toDouble() * (width / cos(seconds * 0.001)))
+//                ((index / horizontalNr).toDouble() * (width / 2))
             )
         }
-        val amount = 15
+        val amount = 17
         val angle = 360.0 / amount
-        var position = Vector2.ZERO
 
         extend(NoClear())
         extend {
@@ -40,10 +40,11 @@ fun main() = application {
 
 //            val mouseXnormalized = map(0.0, , 0.0, width.toDouble()1.0, mouse.position.x)
 //            val mouseYnormalized = map(0.0, perlin(1,height.toDouble()), 0.0, 1.0, mouse.position.y)
-            val scale = width / 5  * 0.001
+//            val scale = width / 5 * 0.001
+            val scale = mouse.position.x * 0.001
 //            val scale = 8.0
             drawer.scale(scale)
-            val translateFactor = (1.0 /scale   ) /2
+            val translateFactor = (1.0 / scale) / 2
 
             drawer.translate(
                 width.toDouble() * translateFactor,
@@ -51,16 +52,16 @@ fun main() = application {
             )
             for (i in 0..amount) {
                 drawer.rectangleBatch {
-                    locations.forEachIndexed { index, location ->
+                    for (index in 0..amount) {
 
                         val sinValue = sin(index * seconds * 0.005) * -cos(index * seconds * 0.001)
                         val cosValue = cos(index * seconds * 0.005) * -sin(index * seconds * 0.001)
                         val sinNormalized = map(-1.0, 1.0, 0.0, 0.8, sinValue)
                         val cosNormalized = map(-1.0, 1.0, 0.0, 0.5, cosValue)
-                        val hueNormalized = map(-1.0, 1.0, 20.0, 120.0, sinValue)
+                        val hueNormalized = map(-1.0, 1.0, 0.0, 120.0, sinValue)
                         val opacity = map(0.0, 1.0, 0.0, 0.5, sinNormalized)
-                        val colorHSVa = ColorHSVa(hueNormalized, sinNormalized  , cosValue)
-//                        val colorHSVa = ColorHSVa(hueNormalized, cosValue, sinValue) // black white yellow brown
+//                        val colorHSVa = ColorHSVa(hueNormalized, sinNormalized  , cosValue)
+                        val colorHSVa = ColorHSVa(hueNormalized, cosValue, sinValue) // black white yellow brown
 //                        val colorHSVa = ColorHSVa(
 //                            hueNormalized,
 //                            map(0.0, 1.0, 0.0, width.toDouble(), perlin(1, width.toDouble())),
@@ -69,50 +70,42 @@ fun main() = application {
 //                        )
 //                        val colorHSVa = ColorHSLa(hueNormalized, cosNormalized, sinNormalized)
 //                        val colorHSVa = ColorHSLa(hueNormalized, cosValue, sinNormalized)
-//                        val colorHSVa = ColorHSLa(hueNormalized, cosValue, 0.0)
+//                        val colorHSVa = ColorHSVa(250.0, 0.5, 0.5)
 
-                        drawer.strokeWeight = sinNormalized
+                        drawer.strokeWeight = 0.5
                         if (index % amount == 0) {
                             //                        drawer.isolated {
 //                            drawer.rotate(30.0)
                             drawer.strokeWeight = sin(seconds * 0.1)
-                            drawer.stroke = colorHSVa.toRGBa().opacify(sinNormalized)
-                            drawer.fill = colorHSVa.toRGBa().opacify(cosNormalized)
+                            drawer.stroke = colorHSVa.toRGBa()
+                            drawer.fill = colorHSVa.toRGBa()
                             //                        }
                         } else {
-                            drawer.fill = colorHSVa.toRGBa().opacify(0.1)
-                            drawer.stroke = colorHSVa.toRGBa().opacify(opacity)
+                            drawer.fill = colorHSVa.toRGBa()
+                            drawer.stroke = colorHSVa.toRGBa()
                         }
+//                        List(5) {
+//                            Vector2(0.0 + i * Random.double(1.0, i.toDouble()), 0.0 + i * Random.double(1.0, i.toDouble()))
+//                        }
                         drawer.contour(ShapeContour.fromPoints(
-                            listOf(
-                                Vector2.ZERO,
-                                Random.vector2(width.toDouble(), height.toDouble()),
-                                Vector2(widthNormalized, heightNormalized)
+                            List(amount) { index ->
+                                Vector2(
+                                    ((index % verticalNr).toDouble() * 0.5 * (height / cos(seconds * 0.1))),
+                                    ((index / horizontalNr).toDouble() *0.5 * (width / cos(seconds * -0.01)))
+//                                    ((index / horizontalNr).toDouble() * (width / 2))
                                 )
+                            }
+//                            List(5) {
+//                                Vector2(0.0 + i * Random.double(1.0, i.toDouble()), 0.0 + i * Random.double(1.0, i.toDouble()))
+//                            }
                             , false
                         ).hobbyCurve())
 
-//                        val points = List(3) {
-//                            drawer.bounds.center + Polar(it * 360.0 / amount, width * Random.double(0.1, 0.4)).cartesian
-//                        }
-//                        val pointyContour = ShapeContour.fromPoints(points, true)
-//                        val smoothContour = pointyContour.hobbyCurve()
-//                        drawer.contour(smoothContour)
 
-
-                        drawer.translate(width.toDouble(), 0.0)
-                        drawer.translate(sin(seconds * 0.1) * width, 0.01)
-//                        drawer.translate(seconds * 0.1, 0.0)
-//                        drawer.translate(mouse.position.x, mouse.position.y)
-                        drawer.translate(position)
-                        position = Vector2(
-                            position.x + Random.perlin(position) * sinValue,
-                            position.y + Random.perlin(position) * cosValue
-                        )
                         drawer.rotate(90.0)
 
 //                        drawer.rectangle(
-//                            location,
+//                            Random.vector2(width.toDouble(), height.toDouble()),
 //                            sinNormalized * sinValue * 50,
 //                            -cosNormalized / cosValue * 10
 //                        )
@@ -125,6 +118,7 @@ fun main() = application {
                 }
                 drawer.rotate(angle)
             }
+            drawer.rotate(-seconds / 360 + 1)
 
         }
     }

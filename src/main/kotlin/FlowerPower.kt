@@ -1,14 +1,10 @@
-import org.openrndr.Fullscreen
 import org.openrndr.application
-import org.openrndr.color.ColorHSLa
 import org.openrndr.color.ColorHSVa
 import org.openrndr.draw.rectangleBatch
 import org.openrndr.extra.noclear.NoClear
 import org.openrndr.extra.noise.Random
-import org.openrndr.extra.noise.perlin
 import org.openrndr.extra.olive.oliveProgram
 import org.openrndr.extra.shapes.hobbyCurve
-import org.openrndr.math.Polar
 import org.openrndr.math.Vector2
 import org.openrndr.math.map
 import org.openrndr.shape.ShapeContour
